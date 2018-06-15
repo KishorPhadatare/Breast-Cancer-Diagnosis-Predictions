@@ -84,3 +84,46 @@ pred.select('lable', 'lableIndex','probability', 'prediction').show()
 evaluator=MulticlassClassificationEvaluator(lableCol="lableIndex", predictionCol="prediction", metricName="accuracy")
 accuracy=evaluator.evaluate(pred)
 print("Error= %g" %(1-accuracy))
+
+
+#Implementing Cross Validation for DecisionTrees:
+from pyspark.ml import Pipeline
+pipeline= Pipeline(stages=[decisionTree])
+
+from pyspark.ml.tuning import CrossValidator, ParamGridBuilder
+paramGrid= ParamGridBuilder().addGrid(decisionTree.maxDepth,[1,2,3,4,5,6,7,8]).build()
+
+#paramGrid= ParamGridBuilder().addGrid(decisionTree.maxDepth,[1,2,3,4,5,6,7,8]).addGrid(decisionTree.minInstancesPerNode,[1,2,3,4,5,6,7,8]).build()
+evaluator=MulticlassClassificationEvaluator(lableCol="lableIndex", predictionCol="prediction", metricName="accuracy")
+crossVal=CrossValidator(estimator=pipeline, estimatorParamMaps=paramGrid, evaluator=evaluator,numFolds=10)
+cvmodel= crossVal.fit(train)
+cvmodel.avgMetrics
+print cvmodel.bestModel.stages[0]
+
+#Implementing Cross Validation for GradientBoost:
+pipeline= Pipeline(stages=[gradientBoost])
+
+from pyspark.ml.tuning import CrossValidator, ParamGridBuilder
+paramGrid= ParamGridBuilder().addGrid(gradientBoost.maxDepth,[1,2,3,4,5,6,7,8]).build()
+
+#paramGrid= ParamGridBuilder().addGrid(gradientBoost.maxDepth,[1,2,3,4,5,6,7,8]).addGrid(gradientBoost.minInstancesPerNode,[1,2,3,4,5,6,7,8]).build()
+evaluator=MulticlassClassificationEvaluator(lableCol="lableIndex", predictionCol="prediction", metricName="accuracy")
+crossVal=CrossValidator(estimator=pipeline, estimatorParamMaps=paramGrid, evaluator=evaluator,numFolds=10)
+cvmodel= crossVal.fit(train)
+cvmodel.avgMetrics
+print cvmodel.bestModel.stages[0]
+
+#Implementing Cross Validation for RandomForestClassifier:
+pipeline= Pipeline(stages=[randomForest])
+
+from pyspark.ml.tuning import CrossValidator, ParamGridBuilder
+paramGrid= ParamGridBuilder().addGrid(randomForest.maxDepth,[1,2,3,4,5,6,7,8]).build()
+
+#paramGrid= ParamGridBuilder().addGrid(randomForest.maxDepth,[1,2,3,4,5,6,7,8]).addGrid(randomForest.minInstancesPerNode,[1,2,3,4,5,6,7,8]).build()
+evaluator=MulticlassClassificationEvaluator(lableCol="lableIndex", predictionCol="prediction", metricName="accuracy")
+crossVal=CrossValidator(estimator=pipeline, estimatorParamMaps=paramGrid, evaluator=evaluator,numFolds=10)
+cvmodel= crossVal.fit(train)
+cvmodel.avgMetrics
+print cvmodel.bestModel.stages[0]
+
+
